@@ -25,15 +25,43 @@ Bookly é um aplicativo mobile, semelhante ao aplicativo "Letterboxd", sendo vol
 Pré-requisitos
 
 - Node.js (versão LTS recomendada)
-- npm ou yarn
+- npx ou yarn
 - Expo CLI: npm install -g expo-cli
 - Um dispositivo físico (Android/iOS) com o app Expo Go.
 
 ## 🚀 Instalação e Execução
-    *Falta adicionar 
 
+### 1️⃣ Clone o repositório:
+ 
+```bash
+https://github.com/Gabriellemllo/Bookly_front.git
+```
+
+## 📂 2° Acesse a pasta do projeto
+
+Para acessar a pasta do projeto, execute:
+
+```bash
+cd ./bookly
+```
+
+## 3° inicialize o npm:
+
+Para inicializar o npm, você deverá instalar as dependências na pasta `bookly`:
+
+```bash
+npx install
+````
+
+Depois de baixar o npm, você rodar o seguinte código
+
+```bash
+npx expo start
+````
+    
 ## 📂 Estrutura do Projeto (Expo Router)
-    *Falta adicionar
+
+*Falta adicionar
     
 ## 👥 Equipe
 
