@@ -37,11 +37,11 @@ Pré-requisitos
     
 ## 👥 Equipe
 
-- Arthur Gonçalves     / RA: 000000 
+- Arthur Gonçalves     / RA: 000000854164
 - Carlos Fabio         / RA: 000000853743
 - Elcio José           / RA: 000000854166
 - Elynne Silva         / RA: 000000854394
 - Giovanna Priscilla   / RA: 000000853796
-- Italo Cézar          / RA: 000000
+- Italo Cézar          / RA: 000000854140
 - Maria Gabrielle      / RA: 000000854105
 - Thiago Henrique      / RA: 000000853832
