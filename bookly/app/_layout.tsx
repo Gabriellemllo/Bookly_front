@@ -21,7 +21,7 @@ export default function RootLayout() {
       <Portal.Host>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="login/index" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/login/index" options={{ headerShown: false }} />
           <Stack.Screen name="register/index" options={{ headerShown: false }} />
           <Stack.Screen name="home/index" options={{ headerShown: false }} />
           <Stack.Screen name="reservas/morador" options={{ headerShown: false }} />
