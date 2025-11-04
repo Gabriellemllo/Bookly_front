@@ -1,15 +1,17 @@
-import { Text, View } from "react-native";
+import { useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import SplashTela from './auth/splash';
 
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Testandooooo</Text>
-    </View>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace('/auth/login');
+    }, 7000); 
+
+    return () => clearTimeout(timer);
+  }, [router]);
+
+  return <SplashTela />;
 }
