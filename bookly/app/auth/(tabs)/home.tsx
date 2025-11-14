@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { Chip, Card, TextInput, Avatar, useTheme, Text } from 'react-native-paper';
-import { BottomNav } from '@/components/ui/gluestack-ui-provider/BottomNav';
+
 
 const genres = ['Romance', 'Terror', 'Ficção', 'Aventura', 'Mistério'];
 const books = [
@@ -60,18 +60,6 @@ export default function Home() {
           ))}
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <BottomNav
-        items={[
-          { name: "Início", icon: "home", route: "home" },
-          { name: "Buscar", icon: "search-outline", route: "search" },
-          { name: "Favoritos", icon: "bookmark-outline", route: "favorites" },
-          { name: "Perfil", icon: "person-outline", route: "profile" },
-          { name: "Config", icon: "settings-outline", route: "settings" },
-        ]}
-        onPress={(route) => console.log("Navegar para:", route)}
-      />
     </View>
   );
 }
