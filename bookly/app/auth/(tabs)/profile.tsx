@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router'; 
 
-
 const ProfileImage = require('../../../assets/images/usuario.jpg');
 const Book1 = require('../../../assets/images/capa_livrocrepusculo.jpg');
 const Book2 = require('../../../assets/images/capa_livrogatsby.jpg');
@@ -36,11 +35,12 @@ export default function Profile() {
 
             <Text style={styles.favoritesTitle}>⭐ Favoritos</Text>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.favoritesContainer}>
-                <Image source={Book1} style={styles.bookCover} />
-                <Image source={Book2} style={styles.bookCover} />
-                <Image source={Book3} style={styles.bookCover} />
-            </ScrollView>
+          
+            <View style={styles.favoritesContainerVertical}>
+                <Image source={Book1} style={styles.bookCoverVertical} />
+                <Image source={Book2} style={styles.bookCoverVertical} />
+                <Image source={Book3} style={styles.bookCoverVertical} />
+            </View>
 
             <View style={{ height: 100 }} /> 
         </ScrollView>
@@ -93,15 +93,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         marginBottom: 10,
     },
-    favoritesContainer: {
+
+    favoritesContainerVertical: {
         paddingHorizontal: 15,
-        marginBottom: 20, 
+        marginBottom: 20,
     },
-    bookCover: {
-        width: 120,
-        height: 180,
-        borderRadius: 8,
-        marginRight: 15,
+    bookCoverVertical: {
+        width: '100%',
+        height: 260,
+        borderRadius: 10,
+        marginBottom: 15,
         resizeMode: 'cover',
     },
 });
