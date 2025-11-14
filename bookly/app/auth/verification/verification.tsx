@@ -1,35 +1,49 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
+import { router } from "expo-router";
 
 export default function VerificationScreen() {
   const [code, setCode] = useState(["", "", "", ""]);
 
   const handleChange = (text: string, index: number) => {
     const newCode = [...code];
-    newCode[index] = text.slice(-1); 
+    newCode[index] = text.slice(-1);
     setCode(newCode);
+  };
+
+  const handleConfirm = () => {
+    const finalCode = code.join("");
+
+    if (finalCode === "0000") {
+      Alert.alert("Código correto!", "Redirecionando...");
+
+    router.push("/auth/(tabs)/home");
+
+
+      return;
+    }
+
+    Alert.alert("Código incorreto", "O código correto para teste é 0000.");
   };
 
   return (
     <View style={styles.container}>
-    
+      
       <Image 
         source={require("../../../assets/images/logo_bookly.png")} 
         style={styles.logo}
       />
 
-    
       <Text style={styles.text}>
         Digite o código que enviamos para o seu e-mail :
       </Text>
 
-     
       <Image 
         source={require("../../../assets/images/envelope.png")}
         style={styles.mailIcon}
       />
 
-   
+      
       <View style={styles.codeContainer}>
         {code.map((digit, index) => (
           <TextInput
@@ -43,10 +57,11 @@ export default function VerificationScreen() {
         ))}
       </View>
 
-      {/* BOTÃO */}
-      <TouchableOpacity style={styles.button}>
+     
+      <TouchableOpacity style={styles.button} onPress={handleConfirm}>
         <Text style={styles.buttonText}>Confirmar</Text>
       </TouchableOpacity>
+
     </View>
   );
 }

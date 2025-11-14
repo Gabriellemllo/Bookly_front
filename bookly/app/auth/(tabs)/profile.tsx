@@ -36,11 +36,14 @@ export default function Profile() {
             <Text style={styles.favoritesTitle}>⭐ Favoritos</Text>
 
           
-            <View style={styles.favoritesContainerVertical}>
-                <Image source={Book1} style={styles.bookCoverVertical} />
-                <Image source={Book2} style={styles.bookCoverVertical} />
-                <Image source={Book3} style={styles.bookCoverVertical} />
-            </View>
+          <View style={styles.favoritesContainer}>
+  <Image source={Book1} style={styles.bookCover} />
+  <Image source={Book2} style={styles.bookCover} />
+  <Image source={Book3} style={styles.bookCover} />
+  <Image source={Book1} style={styles.bookCover} />
+  <Image source={Book2} style={styles.bookCover} />
+  <Image source={Book3} style={styles.bookCover} />
+</View>
 
             <View style={{ height: 100 }} /> 
         </ScrollView>
@@ -94,15 +97,20 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 
-    favoritesContainerVertical: {
-        paddingHorizontal: 15,
-        marginBottom: 20,
-    },
-    bookCoverVertical: {
-        width: '100%',
-        height: 260,
-        borderRadius: 10,
-        marginBottom: 15,
-        resizeMode: 'cover',
-    },
+   favoritesContainer: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  paddingHorizontal: 15,
+  marginBottom: 20,
+},
+
+  bookCover: {
+  width: "30%",      
+  height: 150,
+  borderRadius: 10,
+  marginBottom: 15,
+  resizeMode: "cover",
+},
+
 });
