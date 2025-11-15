@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "bookly",
-    "slug": "bookly",
+    "name": "Bookly",
+    "slug": "Bookly",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_bookly.png",
     "scheme": "bookly",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,9 +13,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#181B20",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
@@ -24,19 +23,19 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logo_bookly.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo_bookly.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#181B20",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#181B20"
           }
         }
       ]
