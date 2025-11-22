@@ -1,6 +1,6 @@
 // app/auth/(tabs)/_layout.tsx
-import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
 
 const ACTIVE_COLOR = "#00FF99"; // Verde (cor ativa)
@@ -14,23 +14,17 @@ export default function TabLayout() {
         tabBarActiveTintColor: ACTIVE_COLOR,
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: {
-          backgroundColor: "#181B20",
-          height: 60,
-          borderTopWidth: 0, 
+          backgroundColor: "#181B20"
         },
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
-
           
           switch (route.name) {
             case "home": 
               iconName = color === ACTIVE_COLOR ? "home" : "home-outline"; 
               break;
-            case "catalog": 
-              iconName = color === ACTIVE_COLOR ? "book" : "book-outline";
-              break;
-            case "rating": 
-              iconName = color === ACTIVE_COLOR ? "star" : "star-outline";
+            case "reviews": 
+              iconName = color === ACTIVE_COLOR ? "chatbubbles" : "chatbubbles-outline";
               break;
             case "profile": 
               iconName = color === ACTIVE_COLOR ? "person" : "person-outline";
@@ -46,10 +40,8 @@ export default function TabLayout() {
         },
       })}
     >
-    
       <Tabs.Screen name="home" options={{ title: "home" }} />
-      <Tabs.Screen name="catalog" options={{ title: "catalog" }} />
-      <Tabs.Screen name="rating" options={{ title: "rating" }} /> 
+      <Tabs.Screen name="reviews" options={{ title: "reviews" }} /> 
       <Tabs.Screen name="profile" options={{ title: "profile" }} />
       <Tabs.Screen name="settings" options={{ title: "settings" }} />
     </Tabs>
