@@ -8,19 +8,19 @@ const FILTERS = ['Todos', 'Romance', 'Terror', 'Aventura', 'Ficção'];
 const BOOKS = [
   { 
     id: 1, 
-    title: 'Crepúsculo', 
+    title: 'Crepúsculo 1', 
     image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
     genre: 'Romance'
   },
   { 
     id: 2, 
-    title: 'O Grande Gatsby', 
+    title: 'O Grande Gatsby 1', 
     image: require('../../../assets/images/capa_livrogatsby.jpg'),
     genre: 'Ficção'
   },
   { 
     id: 3, 
-    title: 'Harry Potter', 
+    title: 'Harry Potter 1', 
     image: require('../../../assets/images/capa_livrohp.jpg'),
     genre: 'Aventura'
   },
@@ -57,6 +57,24 @@ const BOOKS = [
   { 
     id: 9, 
     title: 'Harry Potter 3', 
+    image: require('../../../assets/images/capa_livrohp.jpg'),
+    genre: 'Aventura'
+  },
+  { 
+    id: 10, 
+    title: 'Crepúsculo 4', 
+    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
+    genre: 'Romance'
+  },
+  { 
+    id: 11, 
+    title: 'O Grande Gatsby 4', 
+    image: require('../../../assets/images/capa_livrogatsby.jpg'),
+    genre: 'Ficção'
+  },
+  { 
+    id: 12, 
+    title: 'Harry Potter 4', 
     image: require('../../../assets/images/capa_livrohp.jpg'),
     genre: 'Aventura'
   },
@@ -163,28 +181,29 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     padding: 14, 
-    paddingBottom: 9, 
+    paddingBottom: 9,
+    paddingTop: 40, 
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 14,
+    marginBottom: 20,
   },
   search: { 
     flex: 1,
     borderRadius: 24, 
-    marginHorizontal: 16, 
+    marginHorizontal: 18, 
     backgroundColor: '#ffffffff' 
   },
   filtersScroll: {
     flexGrow: 0,
-    marginBottom: 0,
+    marginBottom: 6,
   },
   filtersContainer: {
     paddingHorizontal: 4,
     paddingBottom: 0,
-    paddingTop: 0,
+    paddingTop: 2,
     gap: 8,
   },
   filterChip: {
@@ -231,7 +250,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 12,
     resizeMode: 'cover',
   },
   emptyContainer: {
