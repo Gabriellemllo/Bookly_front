@@ -64,15 +64,27 @@ const BOOKS = [
 
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
   const screenWidth = Dimensions.get('window').width;
 
-  // Função para filtrar os livros baseado no gênero selecionado
+  // Função para filtrar os livros baseado no gênero e busca
   const getFilteredBooks = () => {
-    if (activeFilter === 'Todos') {
-      return BOOKS;
+    let filtered = BOOKS;
+
+    // Filtro por gênero
+    if (activeFilter !== 'Todos') {
+      filtered = filtered.filter(book => book.genre === activeFilter);
     }
-    return BOOKS.filter(book => book.genre === activeFilter);
+
+    // Filtro por busca
+    if (searchQuery.trim() !== '') {
+      filtered = filtered.filter(book => 
+        book.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return filtered;
   };
 
   const filteredBooks = getFilteredBooks();
@@ -91,6 +103,8 @@ export default function Home() {
           mode="outlined"
           style={styles.search}
           left={<TextInput.Icon icon="magnify" />}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
           theme={{ colors: { background: theme.colors.surface } }}
         />
         <Avatar.Image size={40} source={{ uri: 'https://i.pravatar.cc/150?img=3' }} />
@@ -127,13 +141,19 @@ export default function Home() {
 
       {/* Cards - Livros Filtrados */}
       <ScrollView style={styles.cards} showsVerticalScrollIndicator={false}>
-        <View style={styles.grid}>
-          {filteredBooks.map((book) => (
-            <TouchableOpacity key={book.id} style={styles.bookContainer}>
-              <Image source={book.image} style={styles.bookCover} />
-            </TouchableOpacity>
-          ))}
-        </View>
+        {filteredBooks.length > 0 ? (
+          <View style={styles.grid}>
+            {filteredBooks.map((book) => (
+              <TouchableOpacity key={book.id} style={styles.bookContainer}>
+                <Image source={book.image} style={styles.bookCover} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nenhum livro encontrado</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -213,5 +233,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     resizeMode: 'cover',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    color: '#888',
+    fontSize: 16,
   },
 });
