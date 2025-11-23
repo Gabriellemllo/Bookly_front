@@ -162,8 +162,8 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    padding: 18, 
-    paddingBottom: 0 
+    padding: 14, 
+    paddingBottom: 9, 
   },
   header: {
     flexDirection: 'row',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   filtersContainer: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 4,
     paddingBottom: 0,
     paddingTop: 0,
     gap: 8,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     borderRadius: 10,
-    marginBottom: 15,
+    marginBottom: 10,
     resizeMode: 'cover',
   },
   emptyContainer: {
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   emptyText: {
-    color: '#888',
+    color: '#969696ff',
     fontSize: 16,
   },
 });
