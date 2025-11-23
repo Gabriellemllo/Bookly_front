@@ -2,21 +2,88 @@ import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
 import { TextInput, Avatar, useTheme } from 'react-native-paper';
 
-const FILTERS = ['Romance', 'Terror', 'Aventura', 'Ficção', 'Comédia'];
-const Book1 = require('../../../assets/images/capa_livrocrepusculo.jpg');
-const Book2 = require('../../../assets/images/capa_livrogatsby.jpg');
-const Book3 = require('../../../assets/images/capa_livrohp.jpg');
+const FILTERS = ['Todos', 'Romance', 'Terror', 'Aventura', 'Ficção'];
+
+// Estrutura de dados dos livros com suas categorias
+const BOOKS = [
+  { 
+    id: 1, 
+    title: 'Crepúsculo', 
+    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
+    genre: 'Romance'
+  },
+  { 
+    id: 2, 
+    title: 'O Grande Gatsby', 
+    image: require('../../../assets/images/capa_livrogatsby.jpg'),
+    genre: 'Ficção'
+  },
+  { 
+    id: 3, 
+    title: 'Harry Potter', 
+    image: require('../../../assets/images/capa_livrohp.jpg'),
+    genre: 'Aventura'
+  },
+  { 
+    id: 4, 
+    title: 'Crepúsculo 2', 
+    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
+    genre: 'Romance'
+  },
+  { 
+    id: 5, 
+    title: 'O Grande Gatsby 2', 
+    image: require('../../../assets/images/capa_livrogatsby.jpg'),
+    genre: 'Ficção'
+  },
+  { 
+    id: 6, 
+    title: 'Harry Potter 2', 
+    image: require('../../../assets/images/capa_livrohp.jpg'),
+    genre: 'Aventura'
+  },
+  { 
+    id: 7, 
+    title: 'Crepúsculo 3', 
+    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
+    genre: 'Romance'
+  },
+  { 
+    id: 8, 
+    title: 'O Grande Gatsby 3', 
+    image: require('../../../assets/images/capa_livrogatsby.jpg'),
+    genre: 'Terror'
+  },
+  { 
+    id: 9, 
+    title: 'Harry Potter 3', 
+    image: require('../../../assets/images/capa_livrohp.jpg'),
+    genre: 'Aventura'
+  },
+];
 
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState('Todos');
   const theme = useTheme();
   const screenWidth = Dimensions.get('window').width;
 
+  // Função para filtrar os livros baseado no gênero selecionado
+  const getFilteredBooks = () => {
+    if (activeFilter === 'Todos') {
+      return BOOKS;
+    }
+    return BOOKS.filter(book => book.genre === activeFilter);
+  };
+
+  const filteredBooks = getFilteredBooks();
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}> 
       {/* Header */}
       <View style={styles.header}>
-        <Avatar.Image size={44} source={require('../../../assets/images/logo_bookly.png')} 
+        <Avatar.Image 
+          size={48} 
+          source={require('../../../assets/images/logo_bookly.png')} 
           style={{ backgroundColor: 'transparent' }}
         />
         <TextInput
@@ -26,14 +93,15 @@ export default function Home() {
           left={<TextInput.Icon icon="magnify" />}
           theme={{ colors: { background: theme.colors.surface } }}
         />
-        <Avatar.Image size={44} source={{ uri: 'https://i.pravatar.cc/150?img=3' }} />
+        <Avatar.Image size={40} source={{ uri: 'https://i.pravatar.cc/150?img=3' }} />
       </View>
 
-      {/* Chips - Compactos */}
+      {/* Chips - Filtros */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filtersContainer}
+        style={styles.filtersScroll}
       >
         {FILTERS.map((filter, index) => {
           const isActive = activeFilter === filter;
@@ -57,18 +125,14 @@ export default function Home() {
         })}
       </ScrollView>
 
-      {/* Cards */}
-      <ScrollView style={styles.cards}>
+      {/* Cards - Livros Filtrados */}
+      <ScrollView style={styles.cards} showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
-          <Image source={Book1} style={styles.bookCover} />
-          <Image source={Book2} style={styles.bookCover} />
-          <Image source={Book3} style={styles.bookCover} />
-          <Image source={Book1} style={styles.bookCover} />
-          <Image source={Book2} style={styles.bookCover} />
-          <Image source={Book3} style={styles.bookCover} />
-          <Image source={Book1} style={styles.bookCover} />
-          <Image source={Book2} style={styles.bookCover} />
-          <Image source={Book3} style={styles.bookCover} />
+          {filteredBooks.map((book) => (
+            <TouchableOpacity key={book.id} style={styles.bookContainer}>
+              <Image source={book.image} style={styles.bookCover} />
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -76,17 +140,31 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 25, paddingBottom: 0 },
+  container: { 
+    flex: 1, 
+    padding: 18, 
+    paddingBottom: 0 
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 14,
   },
-  search: { flex: 1, marginHorizontal: 16, backgroundColor: '#ffffffff' },
+  search: { 
+    flex: 1,
+    borderRadius: 24, 
+    marginHorizontal: 16, 
+    backgroundColor: '#ffffffff' 
+  },
+  filtersScroll: {
+    flexGrow: 0,
+    marginBottom: 0,
+  },
   filtersContainer: {
     paddingHorizontal: 0,
-    paddingBottom: 12,
+    paddingBottom: 0,
+    paddingTop: 0,
     gap: 8,
   },
   filterChip: {
@@ -114,7 +192,10 @@ const styles = StyleSheet.create({
     color: '#181B20',
     fontWeight: 'bold',
   },
-  cards: { flex: 1 },
+  cards: { 
+    flex: 1,
+    marginTop: 8,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -123,14 +204,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 80,
   },
-  card: {
-    marginBottom: 12,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#222',
+  bookContainer: {
+    width: '30%',
   },
   bookCover: {
-    width: '30%',
+    width: '100%',
     height: 150,
     borderRadius: 10,
     marginBottom: 15,
