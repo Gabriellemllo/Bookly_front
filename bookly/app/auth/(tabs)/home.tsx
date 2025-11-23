@@ -1,31 +1,25 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { Chip, Card, TextInput, Avatar, useTheme, Text } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
+import { TextInput, Avatar, useTheme } from 'react-native-paper';
 
 
-const genres = ['Romance', 'Terror', 'Ficção', 'Aventura', 'Mistério'];
-const books = [
-  { title: 'Estrelas', img: 'https://i.imgur.com/0y8Ftya.jpg' },
-  { title: 'Harry Potter', img: 'https://i.imgur.com/1bX5QH6.jpg' },
-  { title: 'Cocina', img: 'https://i.imgur.com/2nCt3Sbl.jpg' },
-  { title: 'Estrelas', img: 'https://i.imgur.com/0y8Ftya.jpg' },
-  { title: 'Harry Potter', img: 'https://i.imgur.com/1bX5QH6.jpg' },
-  { title: 'Cocina', img: 'https://i.imgur.com/2nCt3Sbl.jpg' },
-  { title: 'See You Later', img: 'https://i.imgur.com/3M7wh1F.jpg' },
-  { title: 'Cocina', img: 'https://i.imgur.com/2nCt3Sbl.jpg' },
-  { title: 'Estrelas', img: 'https://i.imgur.com/0y8Ftya.jpg' },
-];
+const FILTERS = ['Todos', '5 Estrelas', 'Romance', 'Terror', 'Aventura', 'Ficção'];
+const Book1 = require('../../../assets/images/capa_livrocrepusculo.jpg');
+const Book2 = require('../../../assets/images/capa_livrogatsby.jpg');
+const Book3 = require('../../../assets/images/capa_livrohp.jpg');
 
 export default function Home() {
+  const [activeFilter, setActiveFilter] = useState('Todos');
   const theme = useTheme();
   const screenWidth = Dimensions.get('window').width;
-  const cardWidth = (screenWidth - 30) / 3; // 16 padding + 8*2 gap
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}> 
       {/* Header */}
       <View style={styles.header}>
-        <Avatar.Image size={48} source={{ uri: 'https://i.pravatar.cc/100' }} />
+        <Avatar.Image size={48} source={require('../../../assets/images/logo_bookly.png')} 
+          style={{ backgroundColor: 'transparent' }}
+        />
         <TextInput
           placeholder="Pesquisar Livro"
           mode="outlined"
@@ -37,27 +31,45 @@ export default function Home() {
       </View>
 
       {/* Chips */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chips}>
-        {genres.map((genre, index) => (
-          <Chip
-            key={index}
-            style={styles.chip}
-            textStyle={{ color: theme.colors.onSurface }}
-            mode="outlined"
-          >
-            {genre}
-          </Chip>
-        ))}
-      </ScrollView>
+      <ScrollView
+                          horizontal
+                          showsHorizontalScrollIndicator={false}
+                          contentContainerStyle={styles.filtersContainer}
+                      >
+                          {FILTERS.map((filter, index) => {
+                              const isActive = activeFilter === filter;
+                              return (
+                                  <TouchableOpacity
+                                      key={index}
+                                      style={[
+                                          styles.filterChip,
+                                          isActive && styles.filterChipActive
+                                      ]}
+                                      onPress={() => setActiveFilter(filter)}
+                                  >
+                                      <Text style={[
+                                          styles.filterText,
+                                          isActive && styles.filterTextActive
+                                      ]}>
+                                          {filter}
+                                      </Text>
+                                  </TouchableOpacity>
+                              );
+                          })}
+                      </ScrollView>
 
       {/* Cards */}
       <ScrollView style={styles.cards}>
         <View style={styles.grid}>
-          {books.map((book, i) => (
-            <Card key={i} style={[styles.card, { width: cardWidth }]} mode="elevated">
-              <Card.Cover source={{ uri: book.img }} style={{ height: 140 }} />
-            </Card>
-          ))}
+          <Image source={Book1} style={styles.bookCover} />
+          <Image source={Book2} style={styles.bookCover} />
+          <Image source={Book3} style={styles.bookCover} />
+          <Image source={Book1} style={styles.bookCover} />
+          <Image source={Book2} style={styles.bookCover} />
+          <Image source={Book3} style={styles.bookCover} />
+          <Image source={Book1} style={styles.bookCover} />
+          <Image source={Book2} style={styles.bookCover} />
+          <Image source={Book3} style={styles.bookCover} />
         </View>
       </ScrollView>
     </View>
@@ -72,9 +84,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  search: { flex: 1, marginHorizontal: 12, backgroundColor: 'transparent' },
-  chips: { marginTop: 8, marginBottom: 8 },
-  chip: { marginRight: 8, borderRadius: 12, borderWidth: 1 },
+  search: { flex: 1, marginHorizontal: 16, backgroundColor: 'transparent' },
+  filtersContainer: {
+    paddingHorizontal: 5,
+    paddingBottom: 10,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#555',
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: '#00FF99',
+    borderColor: '#00FF99',
+  },
+  filterText: {
+    color: '#DDD',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  filterTextActive: {
+    color: '#181B20',
+    fontWeight: 'bold',
+  },
   cards: { flex: 1 },
   grid: {
     flexDirection: 'row',
@@ -82,12 +119,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
     marginTop: 8,
-    marginBottom: 80, // espaço para o BottomNav
+    marginBottom: 800,
   },
   card: {
     marginBottom: 12,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#222',
+  },
+  bookCover: {
+    width: '30%',
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 15,
+    resizeMode: 'cover',
   },
 });
