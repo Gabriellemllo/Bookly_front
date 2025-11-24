@@ -19,7 +19,7 @@ export default function RootLayout() {
     <GluestackUIProvider mode="dark">
       <PaperProvider theme={temaEscuro}>
       <Portal.Host>
-        <Stack>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="auth/login/index" options={{ headerShown: false }} />
           <Stack.Screen name="register/index" options={{ headerShown: false }} />
