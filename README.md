@@ -61,7 +61,65 @@ npx expo start
     
 ## 📂 Estrutura do Projeto (Expo Router)
 
-*Falta adicionar
+bookly/
+│
+├── .expo/
+├── .vscode/
+│
+├── app/
+│   ├── auth/
+│   │   ├── (tabs)/
+│   │   │   ├── _layout.tsx
+│   │   │   ├── home.tsx
+│   │   │   ├── profile.tsx
+│   │   │   ├── rating.tsx
+│   │   │   ├── reviews.tsx
+│   │   │   └── settings.tsx
+│   │   │
+│   │   ├── login/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   │
+│   │   ├── register/
+│   │   │   └── register.tsx
+│   │   │
+│   │   ├── splash/
+│   │   │   ├── index.tsx
+│   │   │   └── styles.ts
+│   │   │
+│   │   ├── verification/
+│   │   │   └── verification.tsx
+│   │   │
+│   │   ├── _layout.tsx
+│   │   └── index.tsx
+│
+├── assets/
+│   └── images/
+│       ├── capa_livrocrepusculo.jpg
+│       ├── capa_livrogatsby.jpg
+│       ├── capa_livrohp.jpg
+│       ├── envelope.png
+│       ├── logo_bookly.png
+│       └── usuario.jpg
+│
+├── components/
+│   └── ui/
+│       ├── button.styles.ts
+│       ├── button.tsx
+│       ├── textlink.tsx
+│       └── togglePasswordIcon.tsx
+│
+├── constants/
+│   └── Colors.ts
+│
+├── context/
+│   └── AuthContext.tsx
+│
+├── hooks/
+│   └── useAuth.ts
+│
+└── package.json
+
     
 ## 👥 Equipe
 
