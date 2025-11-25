@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router'; 
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ProfileImage = require('../../../assets/images/usuario.jpg');
 const Book1 = require('../../../assets/images/capa_livrocrepusculo.jpg');
@@ -9,53 +10,58 @@ const Book3 = require('../../../assets/images/capa_livrohp.jpg');
 
 export default function Profile() {
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: '#181B20' }}>
-            <Stack.Screen options={{ 
-                headerShown: false, 
-                title: "profile"
-            }} />
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView style={{ flex: 1, backgroundColor: '#181B20' }}>
+                <Stack.Screen options={{ 
+                    headerShown: false, 
+                    title: "profile"
+                }} />
 
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.iconButton}>
-                    <Text style={styles.iconText}>{"<"}</Text> 
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton}>
-                    <Text style={styles.iconText}>...</Text> 
-                </TouchableOpacity>
+                <View style={styles.header}>
+                    <TouchableOpacity style={styles.iconButton}>
+                        <Text style={styles.iconText}>{"<"}</Text> 
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton}>
+                        <Text style={styles.iconText}>...</Text> 
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.profileSection}>
+                    <Image
+                        source={ProfileImage} 
+                        style={styles.profileImage}
+                    />
+                    <Text style={styles.name}>Roberta Braga</Text>
+                    <Text style={styles.tagline}>Apaixonada por romances!</Text>
+                </View>
+
+                <Text style={styles.favoritesTitle}>⭐ Favoritos</Text>
+
+            
+            <View style={styles.favoritesContainer}>
+                <Image source={Book1} style={styles.bookCover} />
+                <Image source={Book2} style={styles.bookCover} />
+                <Image source={Book3} style={styles.bookCover} />
+                <Image source={Book1} style={styles.bookCover} />
+                <Image source={Book2} style={styles.bookCover} />
+                <Image source={Book3} style={styles.bookCover} />
             </View>
 
-            <View style={styles.profileSection}>
-                <Image
-                    source={ProfileImage} 
-                    style={styles.profileImage}
-                />
-                <Text style={styles.name}>Roberta Braga</Text>
-                <Text style={styles.tagline}>Apaixonada por romances!</Text>
-            </View>
-
-            <Text style={styles.favoritesTitle}>⭐ Favoritos</Text>
-
-          
-          <View style={styles.favoritesContainer}>
-  <Image source={Book1} style={styles.bookCover} />
-  <Image source={Book2} style={styles.bookCover} />
-  <Image source={Book3} style={styles.bookCover} />
-  <Image source={Book1} style={styles.bookCover} />
-  <Image source={Book2} style={styles.bookCover} />
-  <Image source={Book3} style={styles.bookCover} />
-</View>
-
-            <View style={{ height: 100 }} /> 
-        </ScrollView>
+                <View style={{ height: 100 }} /> 
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#181B20'
+    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingHorizontal: 15,
-        paddingTop: 40,
         alignItems: 'center',
     },
     iconButton: {

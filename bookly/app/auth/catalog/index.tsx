@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
+import { CoresEscuras } from "@/constants/Colors";
 
 export default function BookDetailScreen() {
-
   const [favorito, setFavorito] = useState(false);
+  const router = useRouter();
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor={CoresEscuras.background} />
+      <ScrollView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
 
@@ -77,14 +82,20 @@ export default function BookDetailScreen() {
       </View>
 
       <View style={{ height: 30 }} />
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: CoresEscuras.background
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#0d0d0d"
+    backgroundColor: CoresEscuras.background
   },
 
   header: {
@@ -92,7 +103,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 15,
-    paddingTop: 50,
+    paddingTop: 15,
+    paddingBottom: 10,
+    backgroundColor: CoresEscuras.background,
   },
 
   titleHeader: {

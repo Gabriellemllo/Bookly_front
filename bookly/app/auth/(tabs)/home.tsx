@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
 import { TextInput, Avatar, useTheme } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
 const FILTERS = ['Todos', 'Romance', 'Terror', 'Aventura', 'Ficção'];
 
@@ -85,6 +86,11 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
   const screenWidth = Dimensions.get('window').width;
+  const router = useRouter();
+
+  const handleBookPress = (bookId: number) => {
+    router.push('/auth/catalog');
+  };
 
   // Função para filtrar os livros baseado no gênero e busca
   const getFilteredBooks = () => {
@@ -162,7 +168,11 @@ export default function Home() {
         {filteredBooks.length > 0 ? (
           <View style={styles.grid}>
             {filteredBooks.map((book) => (
-              <TouchableOpacity key={book.id} style={styles.bookContainer}>
+              <TouchableOpacity 
+                key={book.id} 
+                style={styles.bookContainer}
+                onPress={() => handleBookPress(book.id)}
+              >
                 <Image source={book.image} style={styles.bookCover} />
               </TouchableOpacity>
             ))}
