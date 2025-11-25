@@ -61,6 +61,7 @@ npx expo start
     
 ## 📂 Estrutura do Projeto (Expo Router)
 
+```bash
 bookly/
 │
 ├── .expo/
@@ -119,7 +120,7 @@ bookly/
 │   └── useAuth.ts
 │
 └── package.json
-
+```
     
 ## 👥 Equipe
 
