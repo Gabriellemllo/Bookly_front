@@ -4,13 +4,16 @@ import { KeyboardAvoidingView, Keyboard } from "react-native";
 import {Platform} from 'react-native';
 import { useState } from 'react';
 import { Ionicons, Entypo } from '@expo/vector-icons';
+import { useRouter } from "expo-router";
 
 // imagem gerada pelo back
 const Image_Back = '';
 
-export default function Rating({ navigation }){
+export default function Rating(){
   const [rating, setRating] = useState(4);
   const [text, setText] = useState('');
+
+  const router = useRouter();
 
   const stars = [1,2,3,4,5];
 
@@ -31,7 +34,7 @@ export default function Rating({ navigation }){
 
         
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="chevron-back" size={26} color="#fff" />
           </TouchableOpacity>
 

@@ -72,8 +72,8 @@ export default function BookDetailScreen() {
 
       {/* Botões */}
       <View style={styles.buttonsRow}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Comentar</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/auth/rating/rating')}>
+          <Text style={styles.buttonText}>Avaliar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
