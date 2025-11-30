@@ -1,37 +1,61 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function RegisterScreen() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [birth, setBirth] = useState("");
+  const [description, setDescription] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleRegister = () => {
-    if (!email || !username || !birth || !password || !confirm) {
-      alert("Preencha todos os campos!");
+  const register = useAuthStore((state) => state.register);
+
+  const handleRegister = async () => {
+    setErrorMessage("");
+
+    if (!email || !username || !password || !confirm) {
+      setErrorMessage("Preencha todos os campos obrigatórios!");
       return;
     }
 
     if (password !== confirm) {
-      alert("As senhas não coincidem!");
+      setErrorMessage("As senhas não coincidem!");
       return;
     }
 
     if (!acceptedTerms) {
-      alert("Você precisa aceitar os Termos de Serviço.");
+      setErrorMessage("Você precisa aceitar os Termos de Serviço.");
       return;
     }
 
-    router.push({
-      pathname: "/auth/verification/verification",
-      params: { email, code: "0000" },
-    });
+    setIsLoading(true);
+
+    try {
+      await register({
+        name: username,
+        email: email.trim(),
+        password,
+        description: description || undefined,
+      });
+
+      Alert.alert("Sucesso!", "Conta criada com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/auth/(tabs)/home"),
+        },
+      ]);
+    } catch (error: any) {
+      setErrorMessage(error.message || "Erro ao criar conta. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,25 +74,32 @@ export default function RegisterScreen() {
         style={styles.input}
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        editable={!isLoading}
       />
 
-      <View style={styles.row}>
-        <TextInput
-          placeholder="Username"
-          placeholderTextColor="#7a7f87"
-          style={[styles.input, styles.halfInput]}
-          value={username}
-          onChangeText={setUsername}
-        />
+      <TextInput
+        placeholder="Nome de usuário"
+        placeholderTextColor="#7a7f87"
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="words"
+        editable={!isLoading}
+      />
 
-        <TextInput
-          placeholder="Nascimento"
-          placeholderTextColor="#7a7f87"
-          style={[styles.input, styles.halfInput]}
-          value={birth}
-          onChangeText={setBirth}
-        />
-      </View>
+      <TextInput
+        placeholder="Descrição (opcional)"
+        placeholderTextColor="#7a7f87"
+        style={styles.input}
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        numberOfLines={2}
+        editable={!isLoading}
+      />
 
       <TextInput
         placeholder="Senha"
@@ -77,6 +108,8 @@ export default function RegisterScreen() {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        autoCapitalize="none"
+        editable={!isLoading}
       />
 
       <TextInput
@@ -86,19 +119,34 @@ export default function RegisterScreen() {
         secureTextEntry
         value={confirm}
         onChangeText={setConfirm}
+        autoCapitalize="none"
+        editable={!isLoading}
       />
 
      
       <TouchableOpacity
         style={styles.checkboxContainer}
-        onPress={() => setAcceptedTerms(!acceptedTerms)}
+        onPress={() => !isLoading && setAcceptedTerms(!acceptedTerms)}
+        disabled={isLoading}
       >
         <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]} />
         <Text style={styles.checkboxText}>Eu aceito os Termos de Serviço</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Cadastrar-se</Text>
+      {!!errorMessage && (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      )}
+
+      <TouchableOpacity 
+        style={[styles.button, isLoading && styles.buttonDisabled]} 
+        onPress={handleRegister}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Cadastrar-se</Text>
+        )}
       </TouchableOpacity>
 
     </View>
@@ -136,17 +184,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 15,
   },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    gap: 10,
-  },
-  halfInput: {
-    width: "48%",
-  },
-
- 
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -177,11 +214,20 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginTop: 12,
   },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   buttonText: {
     textAlign: "center",
     color: "#fff",
     fontSize: 17,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 14,
+    width: "100%",
+    textAlign: "center",
   },
 });
 

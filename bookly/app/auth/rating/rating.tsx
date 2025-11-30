@@ -1,19 +1,23 @@
-import {Text, View, Image, TextInput, StyleSheet} from "react-native";
+import {Text, View, Image, TextInput, StyleSheet, ActivityIndicator, Alert} from "react-native";
 import {TouchableOpacity, TouchableWithoutFeedback} from "react-native";
 import { KeyboardAvoidingView, Keyboard } from "react-native";
 import {Platform} from 'react-native';
 import { useState } from 'react';
 import { Ionicons, Entypo } from '@expo/vector-icons';
-import { useRouter } from "expo-router";
-
-// imagem gerada pelo back
-const Image_Back = '';
+import { useRouter, useLocalSearchParams } from "expo-router";
+import reviewsService from "../../../services/reviews.service";
 
 export default function Rating(){
   const [rating, setRating] = useState(4);
   const [text, setText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
+  const { bookId, bookImage, bookTitle } = useLocalSearchParams<{ 
+    bookId: string; 
+    bookImage: string;
+    bookTitle: string;
+  }>();
 
   const stars = [1,2,3,4,5];
 
@@ -21,8 +25,39 @@ export default function Rating(){
     setRating(value);
   }
 
-  function submitRating(){
-    console.log ({rating, text});
+  async function submitRating(){
+    if (!text.trim()) {
+      Alert.alert('Atenção', 'Por favor, escreva um comentário sobre o livro.');
+      return;
+    }
+
+    if (!bookId) {
+      Alert.alert('Erro', 'ID do livro não encontrado.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await reviewsService.createReview(bookId, {
+        rate: rating,
+        comment: text.trim()
+      });
+
+      Alert.alert(
+        'Sucesso', 
+        'Sua avaliação foi enviada com sucesso!',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.back()
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Erro ao enviar avaliação');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return(
@@ -67,7 +102,7 @@ export default function Rating(){
           </View>
 
           <Image 
-            source={{ uri: Image_Back }} 
+            source={{ uri: bookImage || 'https://via.placeholder.com/140x200' }} 
             style={styles.cover} 
             resizeMode="contain" 
           />
@@ -85,8 +120,17 @@ export default function Rating(){
             maxLength={1000}
           />
 
-          <TouchableOpacity style={styles.button} activeOpacity={0.85} onPress={submitRating}>
-            <Text style={styles.buttonText}>Enviar experiência</Text>
+          <TouchableOpacity 
+            style={[styles.button, isSubmitting && styles.buttonDisabled]} 
+            activeOpacity={0.85} 
+            onPress={submitRating}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Enviar experiência</Text>
+            )}
           </TouchableOpacity>
 
         </View>
@@ -176,6 +220,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 30,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: '#fff',
