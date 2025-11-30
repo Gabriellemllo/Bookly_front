@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Avatar, IconButton } from 'react-native-paper';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 // CORES DO TEMA
 const themeColors = {
@@ -12,7 +15,35 @@ const themeColors = {
 };
 
 export default function Settings() {
+  const router = useRouter();
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da sua conta?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              router.replace('/auth/login');
+            } catch (error: any) {
+              Alert.alert('Erro', error.message || 'Erro ao fazer logout');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   // --- COMPONENTE DE CABEÇALHO REUTILIZÁVEL (Estilo Profile) ---
   const CustomHeader = ({ onBackPress }: { onBackPress?: () => void }) => (
@@ -55,25 +86,27 @@ export default function Settings() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        
-        {/* Header igual ao Profile (com funcionalidade visual de voltar) */}
-        <CustomHeader />
 
         {/* Perfil Card */}
         <View style={styles.profileCard}>
           <View style={styles.profileInfo}>
             <View>
-              <Avatar.Image size={64} source={{ uri: 'https://i.pravatar.cc/100?img=5' }} />
+              <Avatar.Image 
+                size={64} 
+                source={{ uri: user?.profilePhotoUrl || 'https://i.pravatar.cc/100?img=5' }} 
+              />
               <View style={styles.editIconBadge}>
                 <IconButton icon="pencil" iconColor="#000" size={12} style={{ margin: 0 }} />
               </View>
             </View>
             <View style={styles.profileTexts}>
-              <Text style={styles.userName}>Roberta Braga</Text>
-              <Text style={styles.userEmail}>RobertaBB@gmail.com</Text>
+              <Text style={styles.userName}>{user?.name || 'Usuário'}</Text>
+              <Text style={styles.userEmail}>{user?.email || ''}</Text>
             </View>
           </View>
-          <IconButton icon="logout" iconColor={themeColors.textPrimary} size={24} />
+          <TouchableOpacity onPress={handleLogout}>
+            <IconButton icon="logout" iconColor={themeColors.textPrimary} size={24} />
+          </TouchableOpacity>
         </View>
 
         {/* Botão Sobre */}

@@ -1,117 +1,42 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { TextInput, Avatar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-
-const FILTERS = ['Todos', 'Romance', 'Terror', 'Aventura', 'Ficção'];
-
-// Estrutura de dados dos livros com suas categorias
-const BOOKS = [
-  { 
-    id: 1, 
-    title: 'Crepúsculo 1', 
-    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
-    genre: 'Romance'
-  },
-  { 
-    id: 2, 
-    title: 'O Grande Gatsby 1', 
-    image: require('../../../assets/images/capa_livrogatsby.jpg'),
-    genre: 'Ficção'
-  },
-  { 
-    id: 3, 
-    title: 'Harry Potter 1', 
-    image: require('../../../assets/images/capa_livrohp.jpg'),
-    genre: 'Aventura'
-  },
-  { 
-    id: 4, 
-    title: 'Crepúsculo 2', 
-    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
-    genre: 'Romance'
-  },
-  { 
-    id: 5, 
-    title: 'O Grande Gatsby 2', 
-    image: require('../../../assets/images/capa_livrogatsby.jpg'),
-    genre: 'Ficção'
-  },
-  { 
-    id: 6, 
-    title: 'Harry Potter 2', 
-    image: require('../../../assets/images/capa_livrohp.jpg'),
-    genre: 'Aventura'
-  },
-  { 
-    id: 7, 
-    title: 'Crepúsculo 3', 
-    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
-    genre: 'Romance'
-  },
-  { 
-    id: 8, 
-    title: 'O Grande Gatsby 3', 
-    image: require('../../../assets/images/capa_livrogatsby.jpg'),
-    genre: 'Terror'
-  },
-  { 
-    id: 9, 
-    title: 'Harry Potter 3', 
-    image: require('../../../assets/images/capa_livrohp.jpg'),
-    genre: 'Aventura'
-  },
-  { 
-    id: 10, 
-    title: 'Crepúsculo 4', 
-    image: require('../../../assets/images/capa_livrocrepusculo.jpg'),
-    genre: 'Romance'
-  },
-  { 
-    id: 11, 
-    title: 'O Grande Gatsby 4', 
-    image: require('../../../assets/images/capa_livrogatsby.jpg'),
-    genre: 'Ficção'
-  },
-  { 
-    id: 12, 
-    title: 'Harry Potter 4', 
-    image: require('../../../assets/images/capa_livrohp.jpg'),
-    genre: 'Aventura'
-  },
-];
+import { useBooksStore } from '@/stores/useBooksStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function Home() {
-  const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
-  const screenWidth = Dimensions.get('window').width;
   const router = useRouter();
+  
+  const { books, isLoading, error, fetchBooks } = useBooksStore();
+  const user = useAuthStore((state) => state.user);
 
-  const handleBookPress = (bookId: number) => {
-    router.push('/auth/catalog');
+  useEffect(() => {
+    // Carregar livros ao montar o componente
+    fetchBooks();
+  }, []);
+
+  useEffect(() => {
+    // Buscar livros quando o usuário digitar (debounce manual)
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchBooks({ title: searchQuery.trim() });
+      } else {
+        fetchBooks();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleBookPress = (bookId: string) => {
+    router.push({
+      pathname: '/auth/catalog',
+      params: { bookId }
+    });
   };
-
-  // Função para filtrar os livros baseado no gênero e busca
-  const getFilteredBooks = () => {
-    let filtered = BOOKS;
-
-    // Filtro por gênero
-    if (activeFilter !== 'Todos') {
-      filtered = filtered.filter(book => book.genre === activeFilter);
-    }
-
-    // Filtro por busca
-    if (searchQuery.trim() !== '') {
-      filtered = filtered.filter(book => 
-        book.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    return filtered;
-  };
-
-  const filteredBooks = getFilteredBooks();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}> 
@@ -130,50 +55,44 @@ export default function Home() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           theme={{ colors: { background: theme.colors.surface } }}
+          editable={!isLoading}
         />
-        <Avatar.Image size={40} source={{ uri: 'https://i.pravatar.cc/150?img=3' }} />
+        <Avatar.Image 
+          size={40} 
+          source={{ uri: user?.profilePhotoUrl || 'https://i.pravatar.cc/150?img=3' }} 
+        />
       </View>
 
-      {/* Chips - Filtros */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filtersContainer}
-        style={styles.filtersScroll}
-      >
-        {FILTERS.map((filter, index) => {
-          const isActive = activeFilter === filter;
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.filterChip,
-                isActive && styles.filterChipActive
-              ]}
-              onPress={() => setActiveFilter(filter)}
-            >
-              <Text style={[
-                styles.filterText,
-                isActive && styles.filterTextActive
-              ]}>
-                {filter}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Cards - Livros Filtrados */}
+      {/* Cards - Livros */}
       <ScrollView style={styles.cards} showsVerticalScrollIndicator={false}>
-        {filteredBooks.length > 0 ? (
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#00FF99" />
+            <Text style={styles.loadingText}>Carregando livros...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : books.length > 0 ? (
           <View style={styles.grid}>
-            {filteredBooks.map((book) => (
+            {books.map((book) => (
               <TouchableOpacity 
                 key={book.id} 
                 style={styles.bookContainer}
                 onPress={() => handleBookPress(book.id)}
               >
-                <Image source={book.image} style={styles.bookCover} />
+                {book.imgUrl ? (
+                  <Image 
+                    source={{ uri: book.imgUrl }} 
+                    style={styles.bookCover}
+                    defaultSource={require('../../../assets/images/logo_bookly.png')}
+                  />
+                ) : (
+                  <View style={[styles.bookCover, styles.bookCoverPlaceholder]}>
+                    <Text style={styles.bookCoverPlaceholderText}>{book.title.substring(0, 1)}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -272,5 +191,31 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#969696ff',
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 100,
+  },
+  loadingText: {
+    color: '#969696ff',
+    fontSize: 14,
+    marginTop: 12,
+  },
+  errorText: {
+    color: '#ff4444',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  bookCoverPlaceholder: {
+    backgroundColor: '#2a2d35',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bookCoverPlaceholderText: {
+    color: '#00FF99',
+    fontSize: 32,
+    fontWeight: 'bold',
   },
 });

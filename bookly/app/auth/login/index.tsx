@@ -1,29 +1,44 @@
 import React, { useState } from 'react';
-import { View, Image, Text } from 'react-native';
+import { View, Image, Text, ActivityIndicator } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Input, InputField, InputSlot } from '@/components/ui/input';
 import { CustomButton } from '@/components/button';
 import { TextLink } from '@/components/textlink';
 import { TogglePasswordIcon } from '@/components/togglePasswordIcon';
+import { useAuthStore } from '@/stores/useAuthStore';
 import styles from './styles';
 
 export default function LoginScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const [user, setUser] = useState('');
+  
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const login = useAuthStore((state) => state.login);
 
-  const canContinue = user.trim().length > 0 && password.trim().length > 0;
+  const canContinue = email.trim().length > 0 && password.trim().length > 0;
 
-  const handleContinue = () => {
-    if (canContinue) {
-      setErrorMessage('');
-      router.push('/auth/(tabs)/home');
-    } else {
+  const handleContinue = async () => {
+    if (!canContinue) {
       setErrorMessage('Os campos devem ser preenchidos');
+      return;
+    }
+
+    setErrorMessage('');
+    setIsLoading(true);
+
+    try {
+      await login({ email: email.trim(), password });
+      router.replace('/auth/(tabs)/home');
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Erro ao fazer login. Verifique suas credenciais.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -38,22 +53,25 @@ export default function LoginScreen() {
       <Input
         variant="outline"
         size="md"
-        isDisabled={false}
+        isDisabled={isLoading}
         isInvalid={!!errorMessage}
         isReadOnly={false}
         style={styles.input}
       >
         <InputField
-          placeholder="Usuario"
-          value={user}
-          onChangeText={setUser}
+          placeholder="E-mail"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
         />
       </Input>
 
       <Input
         variant="outline"
         size="md"
-        isDisabled={false}
+        isDisabled={isLoading}
         isInvalid={!!errorMessage}
         isReadOnly={false}
         style={styles.input}
@@ -63,6 +81,7 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
           type={showPwd ? 'text' : 'password'}
+          autoCapitalize="none"
         />
         <InputSlot>
           <TogglePasswordIcon
@@ -77,9 +96,12 @@ export default function LoginScreen() {
       )}
 
       <CustomButton
-        title="Continuar"
+        title={isLoading ? '' : 'Continuar'}
         onPress={handleContinue}
-      />
+        disabled={isLoading || !canContinue}
+      >
+        {isLoading && <ActivityIndicator color="#fff" />}
+      </CustomButton>
 
       <View style={styles.linksWrapper}>
         <TextLink

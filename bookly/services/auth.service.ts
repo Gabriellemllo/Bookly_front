@@ -30,7 +30,7 @@ export interface AuthResponse {
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/users/login', credentials);
+      const response = await api.post<AuthResponse>('/auth/login', credentials);
       return response.data;
     } catch (error: any) {
       throw new Error(
@@ -41,7 +41,7 @@ class AuthService {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/users/register', data);
+      const response = await api.post<AuthResponse>('/auth/register', data);
       return response.data;
     } catch (error: any) {
       throw new Error(
@@ -51,7 +51,28 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    return Promise.resolve();
+    try {
+      await api.post('/auth/logout');
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || error.response?.data?.error || 'Erro ao realizar logout'
+      );
+    }
+  }
+
+  /**
+   * Busca usuário por ID
+   * GET /users/:id
+   */
+  async getUserById(userId: string): Promise<User> {
+    try {
+      const response = await api.get<{ message: string; data: User }>(`/users/${userId}`);
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || error.response?.data?.error || 'Erro ao buscar usuário'
+      );
+    }
   }
 }
 

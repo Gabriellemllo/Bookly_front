@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// URL da API em produção
+// URL da API em produção => https://bookly-api-eight.vercel.app
 const API_URL = 'https://bookly-api-eight.vercel.app';
 
 // Cria instância do axios (cliente HTTP) com configurações base

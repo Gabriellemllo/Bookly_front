@@ -1,76 +1,102 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
+import reviewsService, { Review } from '../../../services/reviews.service';
+import authService, { User } from '../../../services/auth.service';
+import booksService, { Book } from '../../../services/books.service';
 
-// data mockado para vizualização
-const REVIEWS = [
-    {
-        id: '1',
-        userName: 'Carlos Silva',
-        userAvatar: 'https://i.pravatar.cc/150?img=11',
-        bookTitle: 'O Grande Gatsby',
-        bookCover: 'https://i.imgur.com/2nCt3Sbl.jpg',
-        rating: 5,
-        comment: 'Uma obra prima! A forma como o autor descreve a alta sociedade é fascinante.',
-        timeAgo: '2 min atrás',
-        genre: 'Ficção'
-    },
-    {
-        id: '2',
-        userName: 'Julia Mendes',
-        userAvatar: 'https://i.pravatar.cc/150?img=5',
-        bookTitle: 'Crepúsculo',
-        bookCover: 'https://i.imgur.com/0y8Ftya.jpg',
-        rating: 3,
-        comment: 'Bom para passar o tempo, mas o romance é um pouco exagerado para o meu gosto atual.',
-        timeAgo: '15 min atrás',
-        genre: 'Romance'
-    },
-    {
-        id: '3',
-        userName: 'Roberto Jr.',
-        userAvatar: 'https://i.pravatar.cc/150?img=60',
-        bookTitle: 'Harry Potter',
-        bookCover: 'https://i.imgur.com/1bX5QH6.jpg',
-        rating: 5,
-        comment: 'Relendo pela décima vez. Nunca perde a magia!',
-        timeAgo: '1h atrás',
-        genre: 'Aventura'
-    },
-    {
-        id: '4',
-        userName: 'Amanda Lee',
-        userAvatar: 'https://i.pravatar.cc/150?img=9',
-        bookTitle: 'It: A Coisa',
-        bookCover: 'https://i.imgur.com/3M7wh1F.jpg',
-        rating: 4,
-        comment: 'Aterrorizante do início ao fim. O desenvolvimento dos personagens é incrível.',
-        timeAgo: '3h atrás',
-        genre: 'Terror'
-    },
-    {
-        id: '5',
-        userName: 'Lucas Pereira',
-        userAvatar: 'https://i.pravatar.cc/150?img=12',
-        bookTitle: 'Orgulho e Preconceito',
-        bookCover: 'https://i.imgur.com/0y8Ftya.jpg',
-        rating: 5,
-        comment: 'O melhor romance de época já escrito. Mr. Darcy é icônico.',
-        timeAgo: '5h atrás',
-        genre: 'Romance'
-    },
-];
-
-const FILTERS = ['Todos', '5 Estrelas', 'Romance', 'Terror', 'Aventura', 'Ficção'];
+interface ReviewWithDetails extends Review {
+    user?: User;
+    book?: Book;
+}
 
 export default function Rating() {
     const [activeFilter, setActiveFilter] = useState('Todos');
+    const [reviews, setReviews] = useState<ReviewWithDetails[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [uniqueGenres, setUniqueGenres] = useState<string[]>([]);
 
-    const filteredReviews = REVIEWS.filter(item => {
+    useEffect(() => {
+        loadReviews();
+    }, []);
+
+    const loadReviews = async (isRefreshing = false) => {
+        try {
+            if (isRefreshing) {
+                setRefreshing(true);
+            } else {
+                setLoading(true);
+            }
+            const reviewsData = await reviewsService.getAllReviews();
+
+            // Buscar detalhes de usuários e livros para cada review
+            const reviewsWithDetails = await Promise.all(
+                reviewsData.map(async (review) => {
+                    try {
+                        const [user, book] = await Promise.all([
+                            authService.getUserById(review.UserId),
+                            booksService.getBookById(review.BookId)
+                        ]);
+                        return { ...review, user, book };
+                    } catch (error) {
+                        console.error('Erro ao buscar detalhes da review:', error);
+                        return { ...review, user: undefined, book: undefined };
+                    }
+                })
+            );
+
+            setReviews(reviewsWithDetails);
+
+            // Extrair gêneros únicos dos livros
+            const genres = new Set<string>();
+            reviewsWithDetails.forEach(review => {
+                if (review.book?.GenderId) {
+                    genres.add(review.book.GenderId);
+                }
+            });
+            setUniqueGenres(Array.from(genres));
+        } catch (error: any) {
+            Alert.alert('Erro', error.message || 'Erro ao carregar avaliações');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    const handleRefresh = () => {
+        loadReviews(true);
+    };
+
+    const getTimeAgo = (dateString: string): string => {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) return 'agora';
+        if (diffMins < 60) return `${diffMins} min atrás`;
+        
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `${diffHours}h atrás`;
+        
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays < 7) return `${diffDays}d atrás`;
+        
+        const diffWeeks = Math.floor(diffDays / 7);
+        if (diffWeeks < 4) return `${diffWeeks}sem atrás`;
+        
+        const diffMonths = Math.floor(diffDays / 30);
+        return `${diffMonths}m atrás`;
+    };
+
+    const filteredReviews = reviews.filter(item => {
         if (activeFilter === 'Todos') return true;
-        if (activeFilter === '5 Estrelas') return item.rating === 5;
-        return item.genre === activeFilter;
+        if (activeFilter === '5 Estrelas') return item.rate === 5;
+        // Para filtrar por gênero, precisaríamos ter o nome do gênero
+        // Por enquanto, mantém todos se não for "5 Estrelas"
+        return true;
     });
 
     const renderStars = (rating: number) => {
@@ -89,31 +115,34 @@ export default function Rating() {
         return <View style={styles.starsContainer}>{stars}</View>;
     };
 
-    const renderItem = ({ item }: { item: typeof REVIEWS[0] }) => (
+    const renderItem = ({ item }: { item: ReviewWithDetails }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
-                <Image source={{ uri: item.userAvatar }} style={styles.avatar} />
+                <Image 
+                    source={{ uri: item.user?.profilePhotoUrl || 'https://i.pravatar.cc/150?img=11' }} 
+                    style={styles.avatar} 
+                />
                 <View style={styles.headerTextContainer}>
                     <View style={styles.rowTitle}>
-                        <Text style={styles.userName}>{item.userName}</Text>
-                        <Text style={styles.timeAgo}>• {item.timeAgo}</Text>
+                        <Text style={styles.userName}>{item.user?.name || 'Usuário'}</Text>
+                        <Text style={styles.timeAgo}>• {getTimeAgo(item.createdAt)}</Text>
                     </View>
                     <Text style={styles.bookAction}>
-                        avaliou <Text style={styles.bookTitle}>{item.bookTitle}</Text>
+                        avaliou <Text style={styles.bookTitle}>{item.book?.title || 'Livro'}</Text>
                     </Text>
                 </View>
             </View>
 
             <View style={styles.contentContainer}>
                 <View style={styles.bookInfoSide}>
-                    <Image source={{ uri: item.bookCover }} style={styles.miniBookCover} />
-                    <View style={styles.miniGenreBadge}>
-                        <Text style={styles.miniGenreText}>{item.genre}</Text>
-                    </View>
+                    <Image 
+                        source={{ uri: item.book?.imgUrl || 'https://via.placeholder.com/50x75' }} 
+                        style={styles.miniBookCover} 
+                    />
                 </View>
 
                 <View style={styles.reviewTextSide}>
-                    {renderStars(item.rating)}
+                    {renderStars(item.rate)}
                     <Text style={styles.comment}>{item.comment}</Text>
                 </View>
             </View>
@@ -136,52 +165,71 @@ export default function Rating() {
             <Stack.Screen options={{ headerShown: false }} />
 
             <View style={styles.headerContainer}>
-                {/* Removi caracteres especiais diretos para evitar erro de encoding */}
                 <Text style={styles.screenTitle}>Feed de Avaliações</Text>
-            </View>
-
-            <View>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.filtersContainer}
+                <TouchableOpacity 
+                    onPress={handleRefresh}
+                    disabled={refreshing}
+                    style={styles.refreshButton}
                 >
-                    {FILTERS.map((filter, index) => {
-                        const isActive = activeFilter === filter;
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                style={[
-                                    styles.filterChip,
-                                    isActive && styles.filterChipActive
-                                ]}
-                                onPress={() => setActiveFilter(filter)}
-                            >
-                                <Text style={[
-                                    styles.filterText,
-                                    isActive && styles.filterTextActive
-                                ]}>
-                                    {filter}
-                                </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </ScrollView>
+                    {refreshing ? (
+                        <ActivityIndicator size="small" color="#00FF99" />
+                    ) : (
+                        <Ionicons name="refresh" size={24} color="#00FF99" />
+                    )}
+                </TouchableOpacity>
             </View>
 
-            <FlatList
-                data={filteredReviews}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="book-outline" size={48} color="#555" />
-                        <Text style={styles.emptyText}>Nenhuma avaliação encontrada.</Text>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#00FF99" />
+                    <Text style={styles.loadingText}>Carregando avaliações...</Text>
+                </View>
+            ) : (
+                <>
+                    <View>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.filtersContainer}
+                        >
+                            {['Todos', '5 Estrelas'].map((filter, index) => {
+                            const isActive = activeFilter === filter;
+                            return (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={[
+                                        styles.filterChip,
+                                        isActive && styles.filterChipActive
+                                    ]}
+                                    onPress={() => setActiveFilter(filter)}
+                                >
+                                    <Text style={[
+                                        styles.filterText,
+                                        isActive && styles.filterTextActive
+                                    ]}>
+                                        {filter}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                        </ScrollView>
                     </View>
-                }
-            />
+
+                    <FlatList
+                        data={filteredReviews}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderItem}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={
+                            <View style={styles.emptyContainer}>
+                                <Ionicons name="book-outline" size={48} color="#555" />
+                                <Text style={styles.emptyText}>Nenhuma avaliação encontrada.</Text>
+                            </View>
+                        }
+                    />
+                </>
+            )}
         </View>
     );
 }
@@ -195,11 +243,17 @@ const styles = StyleSheet.create({
     headerContainer: {
         paddingHorizontal: 20,
         marginBottom: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     screenTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#FFFFFF',
+    },
+    refreshButton: {
+        padding: 8,
     },
     filtersContainer: {
         paddingHorizontal: 20,
@@ -339,6 +393,17 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         color: '#888',
+        marginTop: 10,
+        fontSize: 14,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 100,
+    },
+    loadingText: {
+        color: '#AAA',
         marginTop: 10,
         fontSize: 14,
     }
