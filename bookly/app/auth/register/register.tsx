@@ -9,6 +9,7 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -43,6 +44,7 @@ export default function RegisterScreen() {
         email: email.trim(),
         password,
         description: description || undefined,
+        profilePhotoUrl: profilePhotoUrl.trim() || undefined,
       });
 
       Alert.alert("Sucesso!", "Conta criada com sucesso!", [
@@ -98,6 +100,18 @@ export default function RegisterScreen() {
         onChangeText={setDescription}
         multiline
         numberOfLines={2}
+        editable={!isLoading}
+      />
+
+      <TextInput
+        placeholder="URL da Foto de Perfil (opcional)"
+        placeholderTextColor="#7a7f87"
+        style={styles.input}
+        value={profilePhotoUrl}
+        onChangeText={setProfilePhotoUrl}
+        keyboardType="url"
+        autoCapitalize="none"
+        autoCorrect={false}
         editable={!isLoading}
       />
 

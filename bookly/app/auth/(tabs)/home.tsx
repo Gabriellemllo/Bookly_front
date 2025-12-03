@@ -10,7 +10,7 @@ export default function Home() {
   const theme = useTheme();
   const router = useRouter();
   
-  const { books, isLoading, error, fetchBooks } = useBooksStore();
+  const { books = [], isLoading, error, fetchBooks } = useBooksStore();
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function Home() {
         />
         <Avatar.Image 
           size={40} 
-          source={{ uri: user?.profilePhotoUrl || 'https://i.pravatar.cc/150?img=3' }} 
+          source={{ uri: user?.profilePhotoUrl || 'https://i.pinimg.com/originals/b9/04/8b/b9048b353f53a19766f634eb71967765.jpg' }} 
         />
       </View>
 
@@ -167,13 +167,12 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
     gap: 8,
     marginTop: 8,
     marginBottom: 80,
   },
   bookContainer: {
-    width: '30%',
+    width: '31.5%',
   },
   bookCover: {
     width: '100%',

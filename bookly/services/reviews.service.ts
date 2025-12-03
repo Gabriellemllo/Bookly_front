@@ -1,4 +1,16 @@
 import api from './api';
+import { Book } from './books.service';
+
+export interface ReviewUser {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  description?: string;
+  profilePhotoUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Review {
   id: string;
@@ -8,6 +20,8 @@ export interface Review {
   comment: string;
   createdAt: string;
   updatedAt: string;
+  User?: ReviewUser;
+  Book?: Book;
 }
 
 export interface CreateReviewData {
@@ -16,10 +30,6 @@ export interface CreateReviewData {
 }
 
 class ReviewsService {
-  /**
-   * Busca todas as reviews
-   * GET /reviews
-   */
   async getAllReviews(): Promise<Review[]> {
     try {
       const response = await api.get<{ message: string; data: Review[] }>('/reviews');
@@ -53,10 +63,6 @@ class ReviewsService {
     }
   }
 
-  /**
-   * Cria uma nova review para um livro
-   * POST /reviews?bookId=X
-   */
   async createReview(bookId: string, data: CreateReviewData): Promise<Review> {
     try {
       const response = await api.post<{ message: string; data: Review }>(`/reviews?bookId=${bookId}`, data);
@@ -68,17 +74,12 @@ class ReviewsService {
     }
   }
 
-  /**
-   * Busca a média de avaliações de um livro
-   * GET /reviews/average/book/:bookId
-   */
   async getBookAverageRating(bookId: string): Promise<number> {
     try {
       const response = await api.get<{ message: string; data: { avg: string } }>(`/reviews/average/book/${bookId}`);
       const avgString = response.data.data.avg;
       return parseFloat(avgString) || 0;
     } catch (error: any) {
-      // Se não houver avaliações, retorna 0
       return 0;
     }
   }

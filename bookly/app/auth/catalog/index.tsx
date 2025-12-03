@@ -23,7 +23,6 @@ export default function BookDetailScreen() {
     if (bookId) {
       loadBookDetails();
       checkFavoriteStatus();
-      loadAverageRating();
     }
   }, [bookId]);
 
@@ -33,19 +32,14 @@ export default function BookDetailScreen() {
       setError(null);
       const bookData = await booksService.getBookById(bookId!);
       setBook(bookData);
+      // Atualiza o rating a partir dos dados do livro
+      if (bookData.avgRating) {
+        setAverageRating(parseFloat(bookData.avgRating));
+      }
     } catch (err: any) {
       setError(err.message || 'Erro ao carregar detalhes do livro');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadAverageRating = async () => {
-    try {
-      const avg = await reviewsService.getBookAverageRating(bookId!);
-      setAverageRating(avg);
-    } catch (err) {
-      console.error('Erro ao carregar média de avaliações:', err);
     }
   };
 
@@ -147,7 +141,7 @@ export default function BookDetailScreen() {
               />
             ) : (
               <View style={[styles.cover, styles.coverPlaceholder]}>
-                <Text style={styles.coverPlaceholderText}>{book.title.substring(0, 1)}</Text>
+                <Text style={styles.coverPlaceholderText}>{book?.title?.substring(0, 1) || '?'}</Text>
               </View>
             )}
           </View>
@@ -155,8 +149,7 @@ export default function BookDetailScreen() {
           {/* Info Livro */}
           <Text style={styles.bookTitle}>{book.title}</Text>
           <Text style={styles.meta}>
-            {/*TODO ajustar o retorno do autor na API*/ }
-            {book.year}  •  {book.author?.name || 'Autor desconhecido'}  •  {book.gender?.name || 'Gênero não especificado'}
+            {book.year}  •  {book.Author?.name || 'Autor desconhecido'}  •  {book.Gender?.name || 'Gênero não especificado'}
           </Text>
 
           {/* Sinopse */}
@@ -184,22 +177,24 @@ export default function BookDetailScreen() {
         </>
       ) : null}
 
-      {/* Botões */}
-      <View style={styles.buttonsRow}>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => router.push({
-            pathname: '/auth/rating/rating',
-            params: { 
-              bookId: bookId,
-              bookImage: book?.imgUrl || '',
-              bookTitle: book?.title || ''
-            }
-          })}
-        >
-          <Text style={styles.buttonText}>Avaliar</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Botões - só aparece quando o livro estiver carregado */}
+      {!isLoading && book && (
+        <View style={styles.buttonsRow}>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => router.push({
+              pathname: '/auth/rating/rating',
+              params: { 
+                bookId: bookId,
+                bookImage: book.imgUrl || '',
+                bookTitle: book.title || ''
+              }
+            })}
+          >
+            <Text style={styles.buttonText}>Avaliar</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={{ height: 30 }} />
       </ScrollView>

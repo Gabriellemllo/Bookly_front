@@ -12,7 +12,7 @@ interface AuthState {
 
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (skipApiCall?: boolean) => Promise<void>;
   clearError: () => void;
   setUser: (user: User) => void;
   hydrate: () => Promise<void>;
@@ -72,11 +72,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: async () => {
+      logout: async (skipApiCall = false) => {
         set({ isLoading: true });
         try {
           // Tenta fazer logout na API (se falhar, continua)
-          await authService.logout();
+          // skipApiCall é true quando a sessão já expirou (401)
+          if (!skipApiCall) {
+            await authService.logout();
+          }
         } catch (error) {
           console.error('Erro ao fazer logout na API:', error);
         } finally {

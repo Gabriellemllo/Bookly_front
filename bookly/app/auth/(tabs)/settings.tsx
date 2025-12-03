@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Avatar, IconButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { Ionicons } from '@expo/vector-icons';
 
 // CORES DO TEMA
 const themeColors = {
@@ -49,7 +50,7 @@ export default function Settings() {
   const CustomHeader = ({ onBackPress }: { onBackPress?: () => void }) => (
     <View style={styles.header}>
       <TouchableOpacity style={styles.iconButton} onPress={onBackPress}>
-        <Text style={styles.iconText}>{"<"}</Text> 
+        <Ionicons name="arrow-back" size={28} color="#fff" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.iconButton}>
         <Text style={styles.iconText}>...</Text> 
@@ -62,7 +63,6 @@ export default function Settings() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          {/* Header igual ao Profile */}
           <CustomHeader onBackPress={() => setIsAboutOpen(false)} />
 
           <View style={styles.aboutBadgeContainer}>
@@ -93,7 +93,7 @@ export default function Settings() {
             <View>
               <Avatar.Image 
                 size={64} 
-                source={{ uri: user?.profilePhotoUrl || 'https://i.pravatar.cc/100?img=5' }} 
+                source={{ uri: user?.profilePhotoUrl || 'https://i.pinimg.com/originals/b9/04/8b/b9048b353f53a19766f634eb71967765.jpg' }} 
               />
               <View style={styles.editIconBadge}>
                 <IconButton icon="pencil" iconColor="#000" size={12} style={{ margin: 0 }} />

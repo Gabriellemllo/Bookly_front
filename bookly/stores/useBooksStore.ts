@@ -29,6 +29,7 @@ export const useBooksStore = create<BooksState>((set) => ({
       });
     } catch (error: any) {
       set({
+        books: [],
         error: error.message,
         isLoading: false,
       });

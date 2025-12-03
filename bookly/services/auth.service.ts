@@ -4,10 +4,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string;
   description?: string;
   profilePhotoUrl?: string;
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LoginCredentials {
@@ -20,6 +21,7 @@ export interface RegisterData {
   email: string;
   description?: string;
   password: string;
+  profilePhotoUrl?: string;
 }
 
 export interface AuthResponse {
@@ -30,8 +32,8 @@ export interface AuthResponse {
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/auth/login', credentials);
-      return response.data;
+      const response = await api.post<{ message: string; data: AuthResponse }>('/auth/login', credentials);
+      return response.data.data;
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || error.response?.data?.error || 'Erro ao realizar login'
@@ -41,8 +43,8 @@ class AuthService {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/auth/register', data);
-      return response.data;
+      const response = await api.post<{ message: string; data: AuthResponse }>('/auth/register', data);
+      return response.data.data;
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || error.response?.data?.error || 'Erro ao criar conta'
@@ -60,10 +62,6 @@ class AuthService {
     }
   }
 
-  /**
-   * Busca usuário por ID
-   * GET /users/:id
-   */
   async getUserById(userId: string): Promise<User> {
     try {
       const response = await api.get<{ message: string; data: User }>(`/users/${userId}`);

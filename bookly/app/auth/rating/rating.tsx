@@ -1,4 +1,4 @@
-import {Text, View, Image, TextInput, StyleSheet, ActivityIndicator, Alert} from "react-native";
+import {Text, View, Image, TextInput, StyleSheet, ActivityIndicator, Alert, ScrollView} from "react-native";
 import {TouchableOpacity, TouchableWithoutFeedback} from "react-native";
 import { KeyboardAvoidingView, Keyboard } from "react-native";
 import {Platform} from 'react-native';
@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import reviewsService from "../../../services/reviews.service";
+import { CoresEscuras } from "@/constants/Colors";
 
 export default function Rating(){
   const [rating, setRating] = useState(4);
@@ -61,27 +62,32 @@ export default function Rating(){
   }
 
   return(
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="chevron-back" size={26} color="#fff" />
+            </TouchableOpacity>
 
-        
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={26} color="#fff" />
-          </TouchableOpacity>
+            <Text style={styles.headerTitle}>Avalie o livro</Text>
 
-          <Text style={styles.headerTitle}>Avalie o livro</Text>
+            <TouchableOpacity>
+              <Entypo name="dots-three-vertical" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity>
-            <Entypo name="dots-three-vertical" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        
-        <View style={styles.content}>
+          
+          <View style={styles.content}>
 
           <View style={styles.starsRow}>
             {stars.map((s) => {
@@ -135,15 +141,20 @@ export default function Rating(){
 
         </View>
 
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A202C',
+    backgroundColor: CoresEscuras.background,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
   },
 
   
@@ -204,7 +215,9 @@ const styles = StyleSheet.create({
   input: {
     width: '85%',
     minHeight: 140,
-    backgroundColor: '#E9E9FA',
+    backgroundColor: '#0f1218',
+    borderWidth: 1,
+    borderColor: "#3a3f4b",
     borderRadius: 12,
     padding: 12,
     color: '#fff',
@@ -216,7 +229,7 @@ const styles = StyleSheet.create({
     width: '70%',
     paddingVertical: 14,
     borderRadius: 28,
-    backgroundColor: '#23A2CC',
+    backgroundColor: '#3db0ff',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 30,
