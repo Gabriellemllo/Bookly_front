@@ -1,5 +1,23 @@
 import api from './api';
 
+export interface Author {
+  id: string;
+  name: string;
+  bio?: string;
+  nationality?: string;
+  birthDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Gender {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Book {
   id: string;
   title: string;
@@ -8,6 +26,9 @@ export interface Book {
   year: number;
   AuthorId: string;
   GenderId: string;
+  Author?: Author;
+  Gender?: Gender;
+  avgRating?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -11,11 +11,6 @@ export interface Favorite {
 }
 
 class FavoritesService {
-  /**
-   * Busca favoritos do usuário
-   * Se userId for fornecido: GET /favorites/user/:userId
-   * Senão: GET /favorites (usuário do token)
-   */
   async getFavorites(userId?: string): Promise<Favorite[]> {
     try {
       const url = userId ? `/favorites/user/${userId}` : '/favorites';
@@ -49,10 +44,6 @@ class FavoritesService {
     }
   }
 
-  /**
-   * Verifica se um livro específico está nos favoritos do usuário logado
-   * GET /favorites/user/verify?bookId=xxx (userId vem do token)
-   */
   async checkFavoriteStatus(bookId: string): Promise<{ isFavorite: boolean; favorite: Favorite | null }> {
     try {
       const response = await api.get<{ message: string; data: Favorite | null }>(`/favorites/user/verify?bookId=${bookId}`);
@@ -62,11 +53,6 @@ class FavoritesService {
         favorite: favorite
       };
     } catch (error: any) {
-      // Se retornar 404 ou erro, significa que não está favoritado
-      if (error.response?.status === 404) {
-        return { isFavorite: false, favorite: null };
-      }
-      console.error('Erro ao verificar status de favorito:', error);
       return { isFavorite: false, favorite: null };
     }
   }

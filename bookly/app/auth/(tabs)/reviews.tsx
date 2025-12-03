@@ -3,17 +3,10 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, 
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import reviewsService, { Review } from '../../../services/reviews.service';
-import authService, { User } from '../../../services/auth.service';
-import booksService, { Book } from '../../../services/books.service';
-
-interface ReviewWithDetails extends Review {
-    user?: User;
-    book?: Book;
-}
 
 export default function Rating() {
     const [activeFilter, setActiveFilter] = useState('Todos');
-    const [reviews, setReviews] = useState<ReviewWithDetails[]>([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [uniqueGenres, setUniqueGenres] = useState<string[]>([]);
@@ -30,30 +23,13 @@ export default function Rating() {
                 setLoading(true);
             }
             const reviewsData = await reviewsService.getAllReviews();
-
-            // Buscar detalhes de usuários e livros para cada review
-            const reviewsWithDetails = await Promise.all(
-                reviewsData.map(async (review) => {
-                    try {
-                        const [user, book] = await Promise.all([
-                            authService.getUserById(review.UserId),
-                            booksService.getBookById(review.BookId)
-                        ]);
-                        return { ...review, user, book };
-                    } catch (error) {
-                        console.error('Erro ao buscar detalhes da review:', error);
-                        return { ...review, user: undefined, book: undefined };
-                    }
-                })
-            );
-
-            setReviews(reviewsWithDetails);
+            setReviews(reviewsData);
 
             // Extrair gêneros únicos dos livros
             const genres = new Set<string>();
-            reviewsWithDetails.forEach(review => {
-                if (review.book?.GenderId) {
-                    genres.add(review.book.GenderId);
+            reviewsData.forEach(review => {
+                if (review.Book?.GenderId) {
+                    genres.add(review.Book.GenderId);
                 }
             });
             setUniqueGenres(Array.from(genres));
@@ -94,8 +70,7 @@ export default function Rating() {
     const filteredReviews = reviews.filter(item => {
         if (activeFilter === 'Todos') return true;
         if (activeFilter === '5 Estrelas') return item.rate === 5;
-        // Para filtrar por gênero, precisaríamos ter o nome do gênero
-        // Por enquanto, mantém todos se não for "5 Estrelas"
+        if (activeFilter === '1 Estrela') return item.rate === 1;
         return true;
     });
 
@@ -115,20 +90,20 @@ export default function Rating() {
         return <View style={styles.starsContainer}>{stars}</View>;
     };
 
-    const renderItem = ({ item }: { item: ReviewWithDetails }) => (
+    const renderItem = ({ item }: { item: Review }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <Image 
-                    source={{ uri: item.user?.profilePhotoUrl || 'https://i.pravatar.cc/150?img=11' }} 
+                    source={{ uri: item.User?.profilePhotoUrl || 'https://i.pravatar.cc/150?img=11' }} 
                     style={styles.avatar} 
                 />
                 <View style={styles.headerTextContainer}>
                     <View style={styles.rowTitle}>
-                        <Text style={styles.userName}>{item.user?.name || 'Usuário'}</Text>
+                        <Text style={styles.userName}>{item.User?.name || 'Usuário'}</Text>
                         <Text style={styles.timeAgo}>• {getTimeAgo(item.createdAt)}</Text>
                     </View>
                     <Text style={styles.bookAction}>
-                        avaliou <Text style={styles.bookTitle}>{item.book?.title || 'Livro'}</Text>
+                        avaliou <Text style={styles.bookTitle}>{item.Book?.title || 'Livro'}</Text>
                     </Text>
                 </View>
             </View>
@@ -136,7 +111,7 @@ export default function Rating() {
             <View style={styles.contentContainer}>
                 <View style={styles.bookInfoSide}>
                     <Image 
-                        source={{ uri: item.book?.imgUrl || 'https://via.placeholder.com/50x75' }} 
+                        source={{ uri: item.Book?.imgUrl || 'https://via.placeholder.com/50x75' }} 
                         style={styles.miniBookCover} 
                     />
                 </View>
@@ -192,7 +167,7 @@ export default function Rating() {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={styles.filtersContainer}
                         >
-                            {['Todos', '5 Estrelas'].map((filter, index) => {
+                            {['Todos', '5 Estrelas', '1 Estrela'].map((filter, index) => {
                             const isActive = activeFilter === filter;
                             return (
                                 <TouchableOpacity

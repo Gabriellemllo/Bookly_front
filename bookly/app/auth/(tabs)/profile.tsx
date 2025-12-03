@@ -6,8 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/useAuthStore';
 import favoritesService, { type Favorite } from '@/services/favorites.service';
 
-const DefaultProfileImage = require('../../../assets/images/usuario.jpg');
-
 export default function Profile() {
     const [favorites, setFavorites] = useState<Favorite[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +49,7 @@ export default function Profile() {
                 
                 <View style={styles.profileSection}>
                     <Image
-                        source={user?.profilePhotoUrl ? { uri: user.profilePhotoUrl } : DefaultProfileImage}
+                        source={{ uri: user?.profilePhotoUrl || "https://i.pinimg.com/originals/b9/04/8b/b9048b353f53a19766f634eb71967765.jpg"}}
                         style={styles.profileImage}
                     />
                     <Text style={styles.name}>{user?.name || 'Usuário'}</Text>

@@ -38,6 +38,9 @@ api.interceptors.request.use(
   }
 );
 
+// Flag para evitar múltiplos alertas de sessão expirada
+let isShowingSessionExpiredAlert = false;
+
 // Interceptor para tratamento de erros globais
 api.interceptors.response.use(
   (response) => {
@@ -47,17 +50,42 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (__DEV__) {
+    // Não loga erros 404 pois são esperados (ex: favorito não encontrado)
+    if (__DEV__ && error.response?.status !== 404) {
       console.error(`❌ ${error.config?.url}:`, error.response?.data || error.message);
     }
     
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !isShowingSessionExpiredAlert) {
       // Token inválido/expirado - fazer logout automático
+      isShowingSessionExpiredAlert = true;
+      
       try {
+        const { Alert } = await import('react-native');
+        const { router } = await import('expo-router');
         const { useAuthStore } = await import('../stores/useAuthStore');
-        await useAuthStore.getState().logout();
+        
+        // Faz logout (skipApiCall=true pois a sessão já expirou)
+        await useAuthStore.getState().logout(true);
+        
+        // Exibe alert
+        Alert.alert(
+          'Sessão Expirada',
+          'Sua sessão expirou. Por favor, faça login novamente.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                isShowingSessionExpiredAlert = false;
+                // Redireciona para login
+                router.replace('/auth/login');
+              }
+            }
+          ],
+          { cancelable: false }
+        );
       } catch (err) {
-        console.error('Erro ao fazer logout:', err);
+        console.error('Erro ao tratar expiração de sessão:', err);
+        isShowingSessionExpiredAlert = false;
       }
     }
     
