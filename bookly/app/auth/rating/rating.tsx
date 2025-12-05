@@ -14,8 +14,8 @@ export default function Rating(){
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
-  const { bookId, bookImage, bookTitle } = useLocalSearchParams<{ 
-    bookId: string; 
+  const { bookId, bookImage, bookTitle } = useLocalSearchParams<{
+    bookId: string;
     bookImage: string;
     bookTitle: string;
   }>();

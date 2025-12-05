@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// URL da API em produção => https://bookly-api-eight.vercel.app
 const API_URL = 'https://bookly-api-eight.vercel.app';
 
 // Cria instância do axios (cliente HTTP) com configurações base
@@ -16,7 +15,6 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     try {
-      // Importação dinâmica para evitar circular dependency
       const { useAuthStore } = await import('../stores/useAuthStore');
       const token = useAuthStore.getState().token;
       
