@@ -32,7 +32,6 @@ export default function BookDetailScreen() {
       setError(null);
       const bookData = await booksService.getBookById(bookId!);
       setBook(bookData);
-      // Atualiza o rating a partir dos dados do livro
       if (bookData.avgRating) {
         setAverageRating(parseFloat(bookData.avgRating));
       }
@@ -43,16 +42,13 @@ export default function BookDetailScreen() {
     }
   };
 
-  // Função para calcular quantas estrelas preencher
   const getStarsCount = (rating: number): number => {
     const decimal = rating % 1;
     const fullStars = Math.floor(rating);
     
-    // Se a parte decimal for >= 0.5, arredonda para cima
     if (decimal >= 0.5) {
       return Math.ceil(rating);
     }
-    // Senão, arredonda para baixo
     return fullStars;
   };
 
@@ -74,13 +70,12 @@ export default function BookDetailScreen() {
     setIsFavoriteLoading(true);
     try {
       if (favorito && favoriteData) {
-        // Remover dos favoritos
         await favoritesService.removeFavorite(favoriteData.id);
         setFavorito(false);
         setFavoriteData(null);
         Alert.alert('Sucesso', 'Livro removido dos favoritos');
       } else {
-        // Adicionar aos favoritos
+
         const newFavorite = await favoritesService.addFavorite(bookId!);
         setFavorito(true);
         setFavoriteData(newFavorite);
@@ -97,7 +92,6 @@ export default function BookDetailScreen() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={CoresEscuras.background} />
       <ScrollView style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={28} color="#fff" />
@@ -132,7 +126,6 @@ export default function BookDetailScreen() {
         </View>
       ) : book ? (
         <>
-          {/* Capa */}
           <View style={styles.coverContainer}>
             {book.imgUrl ? (
               <Image
@@ -146,18 +139,15 @@ export default function BookDetailScreen() {
             )}
           </View>
 
-          {/* Info Livro */}
           <Text style={styles.bookTitle}>{book.title}</Text>
           <Text style={styles.meta}>
             {book.year}  •  {book.Author?.name || 'Autor desconhecido'}  •  {book.Gender?.name || 'Gênero não especificado'}
           </Text>
 
-          {/* Sinopse */}
           <Text style={styles.description}>
             {book.description || 'Sem descrição disponível.'}
           </Text>
 
-          {/* Ranking */}
           <Text style={styles.sectionTitle}>RANKING</Text>
 
           <View style={styles.starsRow}>
@@ -177,7 +167,6 @@ export default function BookDetailScreen() {
         </>
       ) : null}
 
-      {/* Botões - só aparece quando o livro estiver carregado */}
       {!isLoading && book && (
         <View style={styles.buttonsRow}>
           <TouchableOpacity 
